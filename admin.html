@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>TraceIP · Cloud Log Dashboard</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="module" src="./dashboard.js"></script>
+</head>
+
+<body class="dashboard-page">
+  <!-- Password Lock Modal Overlay -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-modal">
+      <h2>🔒 Administrator Access</h2>
+      <p>Enter the dashboard password to view protected IP and device logs.</p>
+      <form class="auth-form" id="auth-form">
+        <input type="password" id="auth-password" class="auth-input" placeholder="Enter password" autofocus required />
+        <div class="auth-error" id="auth-error"></div>
+        <button type="submit" class="button button-primary">Unlock Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <main class="dashboard-shell">
+    <header class="dashboard-topbar">
+      <a class="brand" href="./" aria-label="TraceIP home">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <span>TraceIP <small>Network visibility lab</small></span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 0.8rem;">
+        <span id="storage-status" class="storage-badge storage-local">Checking storage…</span>
+        <button id="lock-dashboard" class="button button-secondary small-button" type="button">Lock</button>
+      </div>
+    </header>
+
+    <section class="dashboard-intro" aria-labelledby="dashboard-title">
+      <div>
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Cloud Records</p>
+        <h1 id="dashboard-title">Captured IP & Device Logs</h1>
+      </div>
+      <p>Authorized visitor tests recorded with network IP, device model, operating system, and browser platform.</p>
+    </section>
+
+    <section class="stats-grid" aria-label="Log summary">
+      <article class="stat-card">
+        <p>Total recorded tests</p>
+        <strong id="total-count">—</strong>
+      </article>
+      <article class="stat-card">
+        <p>Tests in last 24 hours</p>
+        <strong id="day-count">—</strong>
+      </article>
+      <article class="stat-card">
+        <p>Mobile / Desktop</p>
+        <strong id="device-ratio">—</strong>
+      </article>
+      <article class="stat-card">
+        <p>Latest test</p>
+        <strong class="stat-date" id="latest-test">No records</strong>
+      </article>
+    </section>
+
+    <section class="dashboard-card" aria-labelledby="log-table-title">
+      <div class="table-toolbar">
+        <div>
+          <h2 id="log-table-title">Visitor IP & Device Log History</h2>
+          <p>Filtered and managed in real time.</p>
+        </div>
+        <label class="sr-only" for="log-search">Search records</label>
+        <input class="table-search" id="log-search" type="search" maxlength="80" placeholder="Search IP, device, model, OS, or time" autocomplete="off" />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Visible IP address</th>
+              <th scope="col">Device / Model</th>
+              <th scope="col">OS & Browser</th>
+              <th scope="col">UTC timestamp</th>
+              <th scope="col" style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="log-body">
+            <tr class="loading-row">
+              <td colspan="5">Loading records…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <p class="page-status" id="page-status">Loading…</p>
+        <div class="pagination" aria-label="Log pages">
+          <button class="button button-secondary small-button" id="previous-page" type="button">Previous</button>
+          <button class="button button-secondary small-button" id="next-page" type="button">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-actions" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <a class="button button-secondary" href="./index.html">← Return to Test Page</a>
+      <button class="button button-danger" id="clear-logs" type="button">Delete all logs</button>
+    </div>
+    <p class="action-status" id="action-status" role="status" aria-live="polite"></p>
+  </main>
+</body>
+
+</html>

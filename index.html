@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AURA STUDIO · Modern minimalist apparel, timeless essentials, and contemporary fashion." />
+  <title>AURA STUDIO · Modern Minimalist Apparel</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script type="module" src="./app.js"></script>
+</head>
+
+<body class="store-body">
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <p>Complimentary worldwide express shipping on orders over $120 · Use code <strong>AURA15</strong> for 15% off</p>
+  </div>
+
+  <!-- Store Navigation Header -->
+  <header class="store-header">
+    <div class="header-container">
+      <button class="mobile-menu-btn" aria-label="Open menu" type="button">
+        <span></span><span></span><span></span>
+      </button>
+
+      <a href="./" class="store-brand">
+        <span class="store-logo-mark">A</span>
+        <span class="store-logo-text">AURA STUDIO</span>
+      </a>
+
+      <nav class="store-nav" aria-label="Main menu">
+        <a href="#new-arrivals" class="nav-item active">New Arrivals</a>
+        <a href="#women" class="nav-item">Women</a>
+        <a href="#men" class="nav-item">Men</a>
+        <a href="#essentials" class="nav-item">Essentials</a>
+        <a href="#editorial" class="nav-item">Editorial</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="header-icon-btn" aria-label="Search items" type="button">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        </button>
+        <button class="header-icon-btn cart-btn" id="cart-toggle" aria-label="Shopping bag" type="button">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-badge" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="store-hero">
+      <div class="hero-image-wrap">
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&auto=format&fit=crop&q=80" alt="Spring Summer 2026 Collection" class="hero-bg-img" />
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="hero-content">
+        <span class="hero-kicker">SPRING / SUMMER 2026</span>
+        <h1 class="hero-headline">Effortless Elegance.<br>Timeless Form.</h1>
+        <p class="hero-description">Discover our latest collection of sustainably crafted linen blends, heavyweight organic cotton essentials, and tailored silhouettes designed for the modern wardrobe.</p>
+        <div class="hero-cta-group">
+          <a href="#products" class="btn btn-store-primary">Shop The Collection</a>
+          <a href="#categories" class="btn btn-store-secondary">Explore Lookbook</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curated Categories -->
+    <section class="section-container" id="categories">
+      <div class="section-title-wrap">
+        <span class="section-sub">CURATED EDIT</span>
+        <h2 class="section-heading">Shop By Category</h2>
+      </div>
+      <div class="category-grid">
+        <div class="category-card">
+          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80" alt="Women's Collection" />
+          <div class="category-card-content">
+            <h3>Women's Collection</h3>
+            <span class="category-link">Shop Now →</span>
+          </div>
+        </div>
+        <div class="category-card">
+          <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80" alt="Men's Tailoring" />
+          <div class="category-card-content">
+            <h3>Men's Tailoring</h3>
+            <span class="category-link">Shop Now →</span>
+          </div>
+        </div>
+        <div class="category-card">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80" alt="Accessories & Leather" />
+          <div class="category-card-content">
+            <h3>Accessories & Goods</h3>
+            <span class="category-link">Shop Now →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trending Products Grid -->
+    <section class="section-container" id="products">
+      <div class="section-title-wrap">
+        <span class="section-sub">SEASONAL ESSENTIALS</span>
+        <h2 class="section-heading">Trending Right Now</h2>
+        <p class="section-desc">Hand-selected silhouettes crafted from premium organic fabrics.</p>
+      </div>
+
+      <div class="product-grid">
+        <!-- Product 1 -->
+        <article class="product-card" data-name="Heavyweight Boxy Tee" data-price="42">
+          <div class="product-image-container">
+            <span class="product-tag">Bestseller</span>
+            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=700&auto=format&fit=crop&q=80" alt="Heavyweight Boxy Tee" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">Organic Cotton</span>
+            <h3 class="product-title">Heavyweight Boxy Tee</h3>
+            <div class="product-price-row">
+              <span class="product-price">$42.00</span>
+              <span class="color-dot" style="background:#e8dfd8"></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 2 -->
+        <article class="product-card" data-name="Relaxed Linen Shirt" data-price="68">
+          <div class="product-image-container">
+            <span class="product-tag new-tag">New</span>
+            <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=700&auto=format&fit=crop&q=80" alt="Relaxed Linen Shirt" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">French Linen</span>
+            <h3 class="product-title">Relaxed Linen Blend Shirt</h3>
+            <div class="product-price-row">
+              <span class="product-price">$68.00</span>
+              <span class="color-dot" style="background:#4b5320"></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 3 -->
+        <article class="product-card" data-name="Classic Trench Coat" data-price="185">
+          <div class="product-image-container">
+            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=700&auto=format&fit=crop&q=80" alt="Classic Trench Coat" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">Outerwear</span>
+            <h3 class="product-title">Classic Structured Trench</h3>
+            <div class="product-price-row">
+              <span class="product-price">$185.00</span>
+              <span class="color-dot" style="background:#c2a688"></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 4 -->
+        <article class="product-card" data-name="Tailored Pleated Trouser" data-price="94">
+          <div class="product-image-container">
+            <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&auto=format&fit=crop&q=80" alt="Tailored Pleated Trouser" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">Wool Blend</span>
+            <h3 class="product-title">Tailored Pleated Trouser</h3>
+            <div class="product-price-row">
+              <span class="product-price">$94.00</span>
+              <span class="color-dot" style="background:#2b2b2b"></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 5 -->
+        <article class="product-card" data-name="Ribbed Cashmere Sweater" data-price="120">
+          <div class="product-image-container">
+            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=700&auto=format&fit=crop&q=80" alt="Ribbed Cashmere Sweater" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">Knitwear</span>
+            <h3 class="product-title">Ribbed Crewneck Sweater</h3>
+            <div class="product-price-row">
+              <span class="product-price">$120.00</span>
+              <span class="color-dot" style="background:#d3d3d3"></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Product 6 -->
+        <article class="product-card" data-name="Vintage Denim Jacket" data-price="115">
+          <div class="product-image-container">
+            <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=700&auto=format&fit=crop&q=80" alt="Vintage Denim Jacket" loading="lazy" />
+            <button class="add-to-bag-btn" type="button">Add to Bag +</button>
+          </div>
+          <div class="product-details">
+            <span class="product-category">Denim</span>
+            <h3 class="product-title">Washed Oversized Denim</h3>
+            <div class="product-price-row">
+              <span class="product-price">$115.00</span>
+              <span class="color-dot" style="background:#466995"></span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Value Props -->
+    <section class="value-props-section">
+      <div class="value-props-grid">
+        <div class="prop-item">
+          <div class="prop-icon">✦</div>
+          <h4>Ethical Craftsmanship</h4>
+          <p>Responsibly sourced organic materials crafted in carbon-neutral partner ateliers.</p>
+        </div>
+        <div class="prop-item">
+          <div class="prop-icon">✈</div>
+          <h4>Complimentary Shipping</h4>
+          <p>Free carbon-offset express delivery worldwide on all orders above $120.</p>
+        </div>
+        <div class="prop-item">
+          <div class="prop-icon">↺</div>
+          <h4>Effortless Returns</h4>
+          <p>Enjoy our 30-day seamless trial with pre-paid return shipping labels included.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter Banner -->
+    <section class="newsletter-section">
+      <div class="newsletter-card">
+        <span class="section-sub">JOIN THE CIRCLE</span>
+        <h2>Enjoy 15% Off Your First Purchase</h2>
+        <p>Subscribe for exclusive access to capsule releases, seasonal lookbooks, and private sales.</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <input type="email" placeholder="Enter your email address" required aria-label="Email address" />
+          <button type="submit" class="btn btn-store-primary">Subscribe</button>
+        </form>
+        <p class="newsletter-status" id="newsletter-status" role="status"></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Store Footer -->
+  <footer class="store-footer">
+    <div class="footer-grid">
+      <div class="footer-col brand-col">
+        <a href="./" class="store-brand">
+          <span class="store-logo-mark">A</span>
+          <span class="store-logo-text">AURA STUDIO</span>
+        </a>
+        <p>Mindful minimalist fashion engineered for durability, timeless elegance, and effortless daily comfort.</p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <ul>
+          <li><a href="#new-arrivals">New Arrivals</a></li>
+          <li><a href="#women">Women's Wardrobe</a></li>
+          <li><a href="#men">Men's Collection</a></li>
+          <li><a href="#essentials">Core Essentials</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Customer Care</h5>
+        <ul>
+          <li><a href="#shipping">Shipping & Orders</a></li>
+          <li><a href="#returns">Returns & Exchanges</a></li>
+          <li><a href="#size-guide">Size Guide</a></li>
+          <li><a href="#contact">Contact Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Sustainability</h5>
+        <ul>
+          <li><a href="#materials">Organic Fibers</a></li>
+          <li><a href="#fair-trade">Fair Trade Factories</a></li>
+          <li><a href="#packaging">Recycled Packaging</a></li>
+          <li><a href="./admin.html" class="discreet-admin-link">Staff Portal</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 AURA STUDIO Apparel Inc. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+        <a href="./admin.html" class="discreet-admin-link">Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="store-toast" id="store-toast" role="status" aria-live="polite">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message">Added to your shopping bag!</span>
+  </div>
+</body>
+
+</html>

@@ -1,117 +1,98 @@
-# TraceIP
+# TraceIP · Cloud & GitHub Pages Edition
 
-TraceIP is a small, consent-based cybersecurity education lab. It shows the limited network address a web server receives when a visitor explicitly authorizes a test. It is for authorized devices, networks, and classroom/lab environments only.
+TraceIP is a consent-based network and device visibility education lab. It demonstrates what public network address and device information is shared with a web application when a visitor explicitly authorizes a test.
 
-## What the lab records
+---
 
-After the visitor checks the consent box and starts a test, the server stores exactly these fields:
+## What the Lab Records
 
-- `ip`: the address visible to this server for that request
-- `timestamp`: the request time in UTC (ISO 8601)
-- `event`: always `authorized_ip_test`
+When a visitor checks the consent box and starts an authorized test, the app records:
 
-It does **not** collect passwords, cookies, browser or device fingerprints, GPS data, location lookups, or form data. It does not try to bypass a VPN, proxy, firewall, or other privacy control. The public confirmation page intentionally never displays the visitor's IP address.
+- **Network IP:** The public IPv4 or IPv6 address visible to the application
+- **Device Model:** e.g. *Apple iPhone*, *Apple iPad*, *Samsung Galaxy*, *Windows PC*, *Apple Mac*
+- **Operating System:** e.g. *iOS 17.5*, *Android 14*, *Windows 11*, *macOS Sonoma*
+- **Browser:** e.g. *Chrome 124*, *Safari 17*, *Edge*, *Firefox*
+- **Screen & Hardware:** Screen resolution and device type (*Mobile / Tablet / Desktop*)
+- **Custom Device Label:** Optional user-provided label (e.g. *"Lab-Laptop-1"*, *"John's Phone"*)
+- **UTC Timestamp:** Accurate ISO timestamp of the authorized test
 
-Records live only in `data/logs.json`, which is not publicly served and is ignored by Git. The default retention period is seven days; expired records are removed whenever the server starts or the protected dashboard is used. An authenticated administrator can delete all records immediately.
+---
 
-## Requirements
+## Live Deployment on GitHub Pages
 
-- Node.js 18 or newer
-- npm
+This project is ready to be hosted 100% on **GitHub Pages** for free, using **Firebase Firestore** as the cloud database.
 
-## Setup and run locally
+### Step 1: Set up Firebase Firestore (2 minutes, Free)
 
-1. Install dependencies:
+1. Go to the [Firebase Console](https://console.firebase.google.com) and click **Create a project**.
+2. Go to **Build** → **Firestore Database** → click **Create database**.
+3. Choose your database location and select **Start in test mode** (or configure security rules allowing read/write on `ip_logs`).
+4. In Project Overview, click the **Web icon (</>)** to register a web app.
+5. Copy the `firebaseConfig` object and paste it into [`firebase-config.js`](file:///d:/project/demo/firebase-config.js):
 
-   ```powershell
-   npm.cmd install
-   ```
+```javascript
+export const firebaseConfig = {
+    apiKey: "AIzaSy...",
+    authDomain: "your-project.firebaseapp.com",
+    projectId: "your-project",
+    storageBucket: "your-project.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef"
+};
 
-2. Copy the example configuration and set a strong, unique dashboard password:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   Edit `.env` and replace `ADMIN_PASSWORD=replace-with-a-long-unique-password`.
-
-3. Start the application:
-
-   ```powershell
-   npm.cmd start
-   ```
-
-4. Open the consent page at [http://localhost:3000](http://localhost:3000). Open [http://localhost:3000/admin](http://localhost:3000/admin) to access the dashboard; the browser will ask for the `ADMIN_USER` and `ADMIN_PASSWORD` from `.env`.
-
-Admin access stays disabled until a non-empty `ADMIN_PASSWORD` is configured. Basic authentication must only be used over HTTPS outside a local lab.
-
-## Configuration
-
-The app reads environment variables and, for convenience in local development, loads a local `.env` file without overriding variables already set by the host.
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `PORT` | `3000` | HTTP listening port. |
-| `ADMIN_USER` | `traceip-admin` | Dashboard username. |
-| `ADMIN_PASSWORD` | none | Required dashboard password; do not commit it. |
-| `LOG_RETENTION_DAYS` | `7` | Log retention window, from 1 to 90 days. |
-| `TRUST_PROXY` | `false` | Whether to use the address supplied by an explicitly trusted reverse proxy. |
-| `NODE_ENV` | `development` | Set to `production` only behind HTTPS; this enables HSTS. |
-| `LOG_FILE` | `data/logs.json` | Optional protected log-file location. |
-
-`TRUST_PROXY` is deliberately `false` by default. With that setting, TraceIP records the direct network peer address from the socket and ignores forwarded-IP headers. Set it to `true` only when the application is behind a reverse proxy you operate and have configured to remove client-supplied forwarding headers and add its own trusted value.
-
-## Local testing from devices on the same Wi-Fi
-
-The server listens on all local interfaces. Find this computer's Wi-Fi IPv4 address:
-
-```powershell
-ipconfig
+// Set your private admin dashboard password here:
+export const ADMIN_PASSWORD = "your-secure-password";
 ```
 
-On another device connected to the **same trusted Wi-Fi**, visit `http://YOUR_COMPUTER_IPV4:3000`, for example `http://192.168.1.20:3000`. The visitor must read the notice and actively check the consent box before the app records an address.
+### Step 2: Push to GitHub & Enable GitHub Pages
 
-If the other device cannot connect, check that Windows Defender Firewall allows inbound TCP traffic on port 3000 for the current **Private** network only. Do not expose this local HTTP server to the public internet. On a same-Wi-Fi test, the recorded address may be the device's local/private address rather than a public internet address.
+1. Initialize Git and commit the files (if not already done):
+   ```powershell
+   git init
+   git add .
+   git commit -m "Deploy TraceIP to GitHub Pages with Firebase"
+   ```
+2. Create a repository on [GitHub](https://github.com/new) and push your code:
+   ```powershell
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   git branch -M main
+   git push -u origin main
+   ```
+3. On your GitHub repository page:
+   - Go to **Settings** → **Pages** (under Code and automation in the left menu).
+   - Under **Build and deployment** > **Source**, choose **Deploy from a branch**.
+   - Under **Branch**, select `main` and folder `/ (root)`, then click **Save**.
+4. In about 1 minute, GitHub will give you your live URL:
+   ```
+   https://YOUR_USERNAME.github.io/YOUR_REPO/
+   ```
 
-## HTTPS deployment
+---
 
-1. Choose a Node.js host or reverse proxy that terminates TLS and provides a valid HTTPS certificate.
-2. Set `NODE_ENV=production`, `ADMIN_USER`, a strong `ADMIN_PASSWORD`, and a short `LOG_RETENTION_DAYS` in the host's secret/environment-variable manager. Never commit `.env`.
-3. Configure the platform to run `npm start` and route HTTPS traffic to the app's `PORT`.
-4. Confirm that HTTP requests redirect to HTTPS at the hosting or proxy layer before placing the lab online. The app enables HSTS only when `NODE_ENV=production`.
-5. Leave `TRUST_PROXY=false` unless the proxy is explicitly trusted and sanitizes forwarded headers. If it is not safe to enable proxy trust, the application will log the proxy connection instead—which is preferable to accepting spoofed client-IP headers.
-6. Restrict `/admin` to authorized staff and protect the server filesystem so that `data/logs.json` cannot be downloaded or read by other accounts.
+## Dashboard Access
 
-Before a public deployment, review your jurisdiction's privacy and retention requirements. An IP address can be personal data under some laws.
+To view, search, and manage your recorded logs:
+* Open `https://YOUR_USERNAME.github.io/YOUR_REPO/admin.html`
+* Enter the password configured in `firebase-config.js` (`ADMIN_PASSWORD`).
+* View real-time logs with:
+  - Live search by IP, device model, or date
+  - Device type badges (Mobile, Desktop, Tablet)
+  - Custom device labels
+  - Total tests and mobile/desktop breakdown
+  - Individual log deletion and bulk "Delete all logs" button
 
-## Understanding IP addresses
+---
 
-- **Public IP address:** The address a network presents to the public internet. It can be shared by many people or devices.
-- **Private/local IP address:** Addresses such as `192.168.x.x`, `10.x.x.x`, or `172.16.x.x` used inside a local network. A same-LAN lab may observe one of these.
-- **NAT:** Network Address Translation lets many local devices share a single outward-facing public address. A server seeing that address cannot determine which individual device behind the NAT made the request.
-- **VPN:** A VPN can cause the server to see a VPN provider's exit address instead of the user's usual public address. TraceIP does not circumvent it.
-- **Proxy:** A proxy can similarly relay a request, so the server may see the proxy address. Forwarded headers are ignored unless `TRUST_PROXY=true` is intentionally configured.
-- **Geolocation limits:** IP geolocation is an estimate, often at city/region or network level. It is not GPS, cannot reliably identify a person, and should not be used for sensitive decisions.
+## Local Testing
 
-## Security controls
-
-- Explicit frontend and server-side consent requirement before a test is logged
-- IP, UTC timestamp, and event name only; no public log endpoint
-- Password-protected dashboard using timing-safe credential comparison
-- No-store responses for authenticated dashboard pages and APIs
-- Content Security Policy, frame protection, referrer policy, permissions policy, MIME-sniffing protection, and production HSTS
-- In-memory request rate limits for the public app and a stricter limit for `/admin`
-- Small JSON request body limit and bounded query inputs
-- Atomic local log writes, retention cleanup, and explicit bulk deletion confirmation
-
-This is a teaching/lab implementation, not a replacement for a centralized production audit system. For multi-instance deployment, use a protected database with access controls, encryption, auditing, and organization-appropriate retention policies.
-
-## Tests
-
-Run the route and access-control tests with:
+You can also run this locally using any static web server:
 
 ```powershell
-npm.cmd test
+# Using npx serve:
+npx serve .
+
+# Or using Node:
+npm test
 ```
 
-The tests verify the consent gate, security headers, protected log access, no-store dashboard responses, public results privacy, and confirmed authenticated deletion. If your PowerShell policy permits `npm`, the equivalent commands work; `npm.cmd` avoids Windows PowerShell script-policy restrictions.
+Then open `http://localhost:3000` (or the port indicated).
