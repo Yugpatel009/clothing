@@ -1,0 +1,17 @@
+{
+  "name": "traceip",
+  "version": "1.0.0",
+  "description": "Consent-based IP logging and network analysis lab.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/app.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>TraceIP · Authorized dashboard</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/dashboard.js" defer></script>
+  </head>
+  <body class="dashboard-page">
+    <main class="dashboard-shell">
+      <header class="dashboard-topbar">
+        <a class="brand" href="/" aria-label="TraceIP home">
+          <span class="brand-mark" aria-hidden="true">T</span>
+          <span>TraceIP <small>Network visibility lab</small></span>
+        </a>
+        <span class="admin-label">Authorized administrator view</span>
+      </header>
+
+      <section class="dashboard-intro" aria-labelledby="dashboard-title">
+        <div>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Protected records</p>
+          <h1 id="dashboard-title">Test log dashboard</h1>
+        </div>
+        <p>Only consented test events are listed here. Logs are automatically retained for the configured short period and can be cleared immediately.</p>
+      </section>
+
+      <section class="stats-grid" aria-label="Log summary">
+        <article class="stat-card"><p>Total retained tests</p><strong id="total-count">—</strong></article>
+        <article class="stat-card"><p>Tests in last 24 hours</p><strong id="day-count">—</strong></article>
+        <article class="stat-card"><p>Latest authorized test</p><strong class="stat-date" id="latest-test">No records</strong></article>
+      </section>
+
+      <section class="dashboard-card" aria-labelledby="log-table-title">
+        <div class="table-toolbar">
+          <div>
+            <h2 id="log-table-title">Authorized IP test logs</h2>
+            <p>Private to this authenticated dashboard.</p>
+          </div>
+          <label class="sr-only" for="log-search">Search records</label>
+          <input class="table-search" id="log-search" type="search" maxlength="80" placeholder="Search IP, event, or time" autocomplete="off" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Visible IP address</th><th scope="col">UTC timestamp</th><th scope="col">Event</th></tr></thead>
+            <tbody id="log-body"><tr class="loading-row"><td colspan="3">Loading protected records…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <p class="page-status" id="page-status">Loading…</p>
+          <div class="pagination" aria-label="Log pages">
+            <button class="button button-secondary small-button" id="previous-page" type="button">Previous</button>
+            <button class="button button-secondary small-button" id="next-page" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="dashboard-actions">
+        <button class="button button-danger" id="clear-logs" type="button">Delete all retained logs</button>
+      </div>
+      <p class="action-status" id="action-status" role="status" aria-live="polite"></p>
+    </main>
+  </body>
+</html>
