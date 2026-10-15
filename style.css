@@ -1164,6 +1164,73 @@ td code {
   color: #7e22ce;
 }
 
+/* Device ID, Hardware & Location styles */
+.device-id-badge {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.gpu-chip-tag {
+  display: block;
+  font-size: 0.74rem;
+  color: #475569;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  margin-top: 0.2rem;
+  word-break: break-word;
+  max-width: 220px;
+}
+
+.hardware-spec-tag {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+.location-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 170px;
+}
+
+.location-city {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.location-isp {
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-style: italic;
+  max-width: 200px;
+  word-break: break-word;
+}
+
+.conn-speed-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+  color: #64748b;
+  margin-top: 0.2rem;
+}
+
 .delete-row-button {
   background: none;
   border: none;

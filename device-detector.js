@@ -1,7 +1,45 @@
 /**
  * Device Detector for TraceIP
- * Extracts operating system, browser, device model, type, and hardware info.
+ * Extracts operating system, browser, device model, type, GPU, hardware info, and persistent device ID.
  */
+
+export function getOrCreateDeviceId() {
+    try {
+        if (typeof localStorage !== "undefined" && localStorage.getItem) {
+            let id = localStorage.getItem("traceip_device_uid");
+            if (!id) {
+                id = "DEV-" + Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+                localStorage.setItem("traceip_device_uid", id);
+            }
+            return id;
+        }
+    } catch {
+        // Fallback if localStorage is restricted
+    }
+    return "DEV-" + Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+}
+
+export function getGpuRenderer() {
+    try {
+        if (typeof document !== "undefined" && document.createElement) {
+            const canvas = document.createElement("canvas");
+            const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            if (gl) {
+                const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+                if (debugInfo) {
+                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    if (renderer) {
+                        const clean = renderer.replace(/^ANGLE \([^,]+,\s*/i, "").replace(/,\s*D3D.*$/i, "").replace(/\)$/, "").trim();
+                        return clean || renderer;
+                    }
+                }
+            }
+        }
+    } catch {
+        // Fallback
+    }
+    return "Standard GPU";
+}
 
 export function detectDevice(customUa, customPlatform) {
     const ua = customUa || (typeof navigator !== "undefined" ? navigator.userAgent : "") || "";
@@ -74,7 +112,7 @@ export function detectDevice(customUa, customPlatform) {
     } else if (/OPR\/(\d+)/i.test(ua) || /Opera\/(\d+)/i.test(ua)) {
         const v = (ua.match(/OPR\/(\d+)/i) || ua.match(/Opera\/(\d+)/i))[1];
         browser = `Opera ${v}`;
-    } else if (/Brave/i.test(ua) || (navigator.brave && typeof navigator.brave.isBrave === "function")) {
+    } else if (/Brave/i.test(ua) || (typeof navigator !== "undefined" && navigator.brave && typeof navigator.brave.isBrave === "function")) {
         browser = "Brave";
     } else if (/Chrome\/(\d+)/i.test(ua) && !/Chromium/i.test(ua)) {
         const v = ua.match(/Chrome\/(\d+)/i)[1];
@@ -93,16 +131,28 @@ export function detectDevice(customUa, customPlatform) {
     const screenResolution = `${screenWidth}x${screenHeight}`;
     const language = typeof navigator !== "undefined" && navigator.language ? navigator.language : "Unknown";
 
+    // Hardware Telemetry
+    const cpu = typeof navigator !== "undefined" && navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} Cores` : "Unknown";
+    const memory = typeof navigator !== "undefined" && navigator.deviceMemory ? `${navigator.deviceMemory} GB RAM` : "Unknown";
+    const touch = typeof navigator !== "undefined" && typeof navigator.maxTouchPoints === "number" ? (navigator.maxTouchPoints > 0 ? `${navigator.maxTouchPoints} Touch` : "No Touch") : "Unknown";
+    const timezone = typeof Intl !== "undefined" && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : "Unknown";
+
     // Construct human-readable summary
     const summary = `${deviceModel} · ${os} · ${browser}`;
 
     return {
+        deviceId: getOrCreateDeviceId(),
         summary,
         model: deviceModel,
         type: deviceType,
         os,
         browser,
         screen: screenResolution,
+        gpu: getGpuRenderer(),
+        cpu,
+        memory,
+        touch,
+        timezone,
         language,
         userAgent: ua
     };

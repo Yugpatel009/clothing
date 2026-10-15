@@ -46,11 +46,15 @@
 
     <section class="stats-grid" aria-label="Log summary">
       <article class="stat-card">
-        <p>Total recorded tests</p>
+        <p>Total recorded visits</p>
         <strong id="total-count">—</strong>
       </article>
       <article class="stat-card">
-        <p>Tests in last 24 hours</p>
+        <p>Unique Devices</p>
+        <strong id="unique-devices-count">—</strong>
+      </article>
+      <article class="stat-card">
+        <p>Visits in last 24h</p>
         <strong id="day-count">—</strong>
       </article>
       <article class="stat-card">
@@ -58,39 +62,36 @@
         <strong id="device-ratio">—</strong>
       </article>
       <article class="stat-card">
-        <p>Network Connectivity</p>
+        <p>Network (Dual/v4/v6)</p>
         <strong id="network-ratio">—</strong>
-      </article>
-      <article class="stat-card">
-        <p>Latest test</p>
-        <strong class="stat-date" id="latest-test">No records</strong>
       </article>
     </section>
 
     <section class="dashboard-card" aria-labelledby="log-table-title">
       <div class="table-toolbar">
         <div>
-          <h2 id="log-table-title">Visitor IP & Device Log History</h2>
-          <p>Filtered and managed in real time with Dual-Stack (IPv4 & IPv6) tracking.</p>
+          <h2 id="log-table-title">Visitor Device, Network & ISP History</h2>
+          <p>Filtered and managed in real time with unique device identification.</p>
         </div>
         <label class="sr-only" for="log-search">Search records</label>
-        <input class="table-search" id="log-search" type="search" maxlength="80" placeholder="Search IPv4, IPv6, network, device, OS, or time" autocomplete="off" />
+        <input class="table-search" id="log-search" type="search" maxlength="100" placeholder="Search by Device ID, IP, City, ISP, GPU, Model, OS..." autocomplete="off" />
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">Network & IP Addresses (v4 / v6)</th>
-              <th scope="col">Device / Model</th>
-              <th scope="col">OS & Browser</th>
-              <th scope="col">UTC timestamp</th>
+              <th scope="col">Device ID & Hardware</th>
+              <th scope="col">IP Addresses (v4 / v6)</th>
+              <th scope="col">Location & ISP Carrier</th>
+              <th scope="col">OS, Browser & Screen</th>
+              <th scope="col">UTC Timestamp</th>
               <th scope="col" style="text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody id="log-body">
             <tr class="loading-row">
-              <td colspan="5">Loading records…</td>
+              <td colspan="6">Loading records…</td>
             </tr>
           </tbody>
         </table>

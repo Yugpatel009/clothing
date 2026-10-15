@@ -87,7 +87,7 @@ function setRow(message, className) {
     const row = document.createElement("tr");
     row.className = className;
     const cell = document.createElement("td");
-    cell.colSpan = 5;
+    cell.colSpan = 6;
     cell.textContent = message;
     row.append(cell);
     body.append(row);
@@ -104,7 +104,51 @@ function renderLogs(logs) {
     for (const log of logs) {
         const row = document.createElement("tr");
 
-        // 1. IP & Network Connectivity
+        // 1. Device ID & Hardware
+        const devCell = document.createElement("td");
+        
+        // Persistent Unique Device ID badge
+        const devId = log.deviceId || log.device?.deviceId || "DEV-UNKNOWN";
+        const devIdBadge = document.createElement("span");
+        devIdBadge.className = "device-id-badge";
+        devIdBadge.textContent = devId;
+        devCell.append(devIdBadge);
+
+        // Device Model & Type Badge
+        const modelRow = document.createElement("div");
+        modelRow.style.display = "flex";
+        modelRow.style.alignItems = "center";
+        modelRow.style.gap = "0.4rem";
+        modelRow.style.marginTop = "0.2rem";
+
+        const devType = log.device?.type || "Desktop";
+        const devTypeBadge = document.createElement("span");
+        devTypeBadge.className = `device-badge type-badge-${devType.toLowerCase()}`;
+        devTypeBadge.textContent = devType;
+
+        const devNameSpan = document.createElement("strong");
+        devNameSpan.textContent = log.device?.model || "Standard Device";
+
+        modelRow.append(devTypeBadge, devNameSpan);
+        devCell.append(modelRow);
+
+        // GPU Chip
+        if (log.device?.gpu && log.device.gpu !== "Standard GPU") {
+            const gpuTag = document.createElement("span");
+            gpuTag.className = "gpu-chip-tag";
+            gpuTag.title = log.device.gpu;
+            gpuTag.textContent = `GPU: ${log.device.gpu}`;
+            devCell.append(gpuTag);
+        }
+
+        if (log.device?.customName) {
+            const customTag = document.createElement("span");
+            customTag.className = "custom-device-tag";
+            customTag.textContent = `Label: "${log.device.customName}"`;
+            devCell.append(customTag);
+        }
+
+        // 2. IP & Network Connectivity
         const ipCell = document.createElement("td");
         const ipGroup = document.createElement("div");
         ipGroup.className = "ip-group";
@@ -155,43 +199,78 @@ function renderLogs(logs) {
         }
         ipGroup.append(v6Row);
 
-        ipCell.append(ipGroup);
-
-        // 2. Device / Model
-        const devCell = document.createElement("td");
-        const devType = log.device?.type || "Desktop";
-        const devTypeBadge = document.createElement("span");
-        devTypeBadge.className = `device-badge type-badge-${devType.toLowerCase()}`;
-        devTypeBadge.textContent = devType;
-
-        const devNameSpan = document.createElement("strong");
-        devNameSpan.style.display = "block";
-        devNameSpan.style.marginTop = "0.25rem";
-        devNameSpan.textContent = log.device?.model || "Standard Device";
-
-        devCell.append(devTypeBadge, devNameSpan);
-
-        if (log.device?.customName) {
-            const customTag = document.createElement("span");
-            customTag.className = "custom-device-tag";
-            customTag.textContent = `Label: "${log.device.customName}"`;
-            devCell.append(customTag);
+        // Connection Speed / Telemetry
+        if (log.connection?.downlink || (log.connection?.type && log.connection.type !== "Unknown")) {
+            const connSpeed = document.createElement("span");
+            connSpeed.className = "conn-speed-tag";
+            const parts = [];
+            if (log.connection.type && log.connection.type !== "Unknown") parts.push(log.connection.type);
+            if (log.connection.downlink) parts.push(log.connection.downlink);
+            if (log.connection.rtt) parts.push(log.connection.rtt);
+            connSpeed.textContent = parts.join(" · ");
+            ipGroup.append(connSpeed);
         }
 
-        // 3. OS & Browser
+        ipCell.append(ipGroup);
+
+        // 3. Location & ISP Carrier
+        const locCell = document.createElement("td");
+        const locGroup = document.createElement("div");
+        locGroup.className = "location-group";
+
+        const loc = log.location || {};
+        const flag = loc.flag || "🌐";
+        const cityText = loc.city && loc.city !== "Unknown City" ? loc.city : "Detected Location";
+        const countryText = loc.country || "";
+
+        const cityEl = document.createElement("div");
+        cityEl.className = "location-city";
+        cityEl.textContent = `${flag} ${cityText}${countryText ? ", " + countryText : ""}`;
+        locGroup.append(cityEl);
+
+        if (loc.isp && loc.isp !== "Unknown ISP") {
+            const ispEl = document.createElement("div");
+            ispEl.className = "location-isp";
+            ispEl.textContent = loc.isp;
+            locGroup.append(ispEl);
+        }
+
+        if (loc.timezone || log.device?.timezone) {
+            const tzEl = document.createElement("small");
+            tzEl.style.color = "var(--muted)";
+            tzEl.style.fontSize = "0.72rem";
+            tzEl.textContent = loc.timezone || log.device?.timezone || "";
+            locGroup.append(tzEl);
+        }
+
+        locCell.append(locGroup);
+
+        // 4. OS, Browser & Screen
         const osCell = document.createElement("td");
         const osText = document.createElement("div");
+        osText.style.fontWeight = "600";
         osText.textContent = log.device?.os || "Unknown OS";
+
         const browserText = document.createElement("small");
         browserText.style.color = "var(--muted)";
+        browserText.style.display = "block";
         browserText.textContent = log.device?.browser || "";
-        osCell.append(osText, browserText);
 
-        // 4. Timestamp
+        const specText = document.createElement("span");
+        specText.className = "hardware-spec-tag";
+        const hardwareSpecs = [];
+        if (log.device?.screen && log.device.screen !== "0x0") hardwareSpecs.push(log.device.screen);
+        if (log.device?.cpu && log.device.cpu !== "Unknown") hardwareSpecs.push(log.device.cpu);
+        if (log.device?.memory && log.device.memory !== "Unknown") hardwareSpecs.push(log.device.memory);
+        specText.textContent = hardwareSpecs.join(" · ");
+
+        osCell.append(osText, browserText, specText);
+
+        // 5. Timestamp
         const timeCell = document.createElement("td");
         timeCell.textContent = formatUtc(log.timestamp);
 
-        // 5. Action (Delete)
+        // 6. Action (Delete)
         const actionCell = document.createElement("td");
         actionCell.style.textAlign = "right";
         const delBtn = document.createElement("button");
@@ -199,7 +278,7 @@ function renderLogs(logs) {
         delBtn.textContent = "✕ Delete";
         delBtn.type = "button";
         delBtn.addEventListener("click", async () => {
-            const identifier = log.ipv4 || log.ipv6 || log.ip;
+            const identifier = devId !== "DEV-UNKNOWN" ? devId : (log.ipv4 || log.ipv6 || log.ip);
             if (!confirm(`Delete log record for ${identifier}?`)) return;
             delBtn.disabled = true;
             delBtn.textContent = "Deleting…";
@@ -215,7 +294,7 @@ function renderLogs(logs) {
         });
         actionCell.append(delBtn);
 
-        row.append(ipCell, devCell, osCell, timeCell, actionCell);
+        row.append(devCell, ipCell, locCell, osCell, timeCell, actionCell);
         body.append(row);
     }
 }
@@ -231,8 +310,12 @@ function renderSummary(logs) {
     let dualCount = 0;
     let v4Count = 0;
     let v6Count = 0;
+    const uniqueDeviceIds = new Set();
 
     for (const l of logs) {
+        const id = l.deviceId || l.device?.deviceId;
+        if (id) uniqueDeviceIds.add(id);
+
         const t = (l.device?.type || "").toLowerCase();
         if (t === "mobile" || t === "tablet") mobileCount++;
         else desktopCount++;
@@ -244,15 +327,15 @@ function renderSummary(logs) {
     }
 
     document.querySelector("#total-count").textContent = total;
+    const uniqueEl = document.querySelector("#unique-devices-count");
+    if (uniqueEl) {
+        uniqueEl.textContent = uniqueDeviceIds.size || (total ? 1 : 0);
+    }
     document.querySelector("#day-count").textContent = last24Hours;
     document.querySelector("#device-ratio").textContent = `${mobileCount} Mob / ${desktopCount} Desk`;
     const netRatio = document.querySelector("#network-ratio");
     if (netRatio) {
         netRatio.textContent = `${dualCount} Dual / ${v4Count} v4 / ${v6Count} v6`;
-    }
-    const latestTest = document.querySelector("#latest-test");
-    if (latestTest) {
-        latestTest.textContent = logs[0] ? formatUtc(logs[0].timestamp) : "No records";
     }
 }
 
@@ -261,7 +344,7 @@ function filterAndPaginate() {
     const q = state.query.toLowerCase();
     state.filteredLogs = state.allLogs.filter((log) => {
         if (!q) return true;
-        const haystack = `${log.ip || ""} ${log.ipv4 || ""} ${log.ipv6 || ""} ${log.networkType || ""} ${log.device?.model || ""} ${log.device?.customName || ""} ${log.device?.os || ""} ${log.device?.browser || ""} ${log.timestamp || ""}`.toLowerCase();
+        const haystack = `${log.deviceId || ""} ${log.device?.deviceId || ""} ${log.ip || ""} ${log.ipv4 || ""} ${log.ipv6 || ""} ${log.networkType || ""} ${log.location?.city || ""} ${log.location?.country || ""} ${log.location?.isp || ""} ${log.device?.gpu || ""} ${log.device?.model || ""} ${log.device?.customName || ""} ${log.device?.os || ""} ${log.device?.browser || ""} ${log.timestamp || ""}`.toLowerCase();
         return haystack.includes(q);
     });
 

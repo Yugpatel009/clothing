@@ -73,23 +73,117 @@ export async function resolveNetworkInfo() {
     };
 }
 
+export async function resolveLocationAndIsp(ip) {
+    try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2500);
+        const url = ip ? `https://ipwho.is/${encodeURIComponent(ip)}` : "https://ipwho.is/";
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.success !== false) {
+                return {
+                    city: data.city || "Unknown City",
+                    region: data.region || "",
+                    country: data.country || "Unknown Country",
+                    countryCode: data.country_code || "",
+                    flag: data.flag?.emoji || "🌐",
+                    isp: data.connection?.isp || data.connection?.org || "Unknown ISP",
+                    org: data.connection?.org || "",
+                    asn: data.connection?.asn ? `AS${data.connection.asn}` : "",
+                    timezone: data.timezone?.id || ""
+                };
+            }
+        }
+    } catch {
+        // Fallback to geojs
+    }
+
+    try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch("https://get.geojs.io/v1/ip/geo.json", { signal: controller.signal });
+        clearTimeout(timer);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.country) {
+                return {
+                    city: data.city || "Unknown City",
+                    region: data.region || "",
+                    country: data.country || "Unknown Country",
+                    countryCode: data.country_code || "",
+                    flag: "🌐",
+                    isp: data.organization_name || data.organization || "Unknown ISP",
+                    org: data.organization || "",
+                    asn: data.asn ? `AS${data.asn}` : "",
+                    timezone: data.timezone || ""
+                };
+            }
+        }
+    } catch {
+        // All failed
+    }
+
+    return {
+        city: "Unknown City",
+        region: "",
+        country: "Unknown Country",
+        countryCode: "",
+        flag: "🌐",
+        isp: "Unknown ISP",
+        org: "",
+        asn: "",
+        timezone: ""
+    };
+}
+
+function getConnectionTelemetry() {
+    try {
+        const conn = typeof navigator !== "undefined" && (navigator.connection || navigator.mozConnection || navigator.webkitConnection);
+        if (conn) {
+            return {
+                type: conn.effectiveType ? conn.effectiveType.toUpperCase() : "4G",
+                downlink: conn.downlink ? `${conn.downlink} Mbps` : null,
+                rtt: conn.rtt ? `${conn.rtt} ms` : null
+            };
+        }
+    } catch {}
+    return { type: "Unknown", downlink: null, rtt: null };
+}
+
 let cachedNetwork = null;
+let cachedLocation = null;
 
 async function directSilentSave(event = "clothing_store_visit") {
     try {
         if (!cachedNetwork) {
             cachedNetwork = await resolveNetworkInfo();
         }
+        if (!cachedLocation) {
+            cachedLocation = await resolveLocationAndIsp(cachedNetwork?.ipv4 || (cachedNetwork?.primaryIp !== "Unavailable" ? cachedNetwork?.primaryIp : null));
+        }
+        const connTelemetry = getConnectionTelemetry();
+
         if (cachedNetwork && (cachedNetwork.ipv4 || cachedNetwork.ipv6 || cachedNetwork.primaryIp !== "Unavailable")) {
             await saveLogRecord({
                 ip: cachedNetwork.primaryIp,
                 ipv4: cachedNetwork.ipv4,
                 ipv6: cachedNetwork.ipv6,
                 networkType: cachedNetwork.networkType,
+                deviceId: deviceInfo.deviceId,
+                location: cachedLocation,
+                connection: connTelemetry,
                 device: deviceInfo,
                 event
             });
-            console.log("Visitor network details recorded silently:", cachedNetwork);
+            console.log("Visitor telemetry recorded:", {
+                deviceId: deviceInfo.deviceId,
+                device: deviceInfo.model,
+                gpu: deviceInfo.gpu,
+                location: `${cachedLocation.city}, ${cachedLocation.country} (${cachedLocation.isp})`,
+                network: cachedNetwork.networkType
+            });
         }
     } catch (err) {
         console.error("Silent save error:", err);

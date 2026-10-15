@@ -78,6 +78,9 @@ export async function saveLogRecord({
     ipv4,
     ipv6,
     networkType,
+    deviceId,
+    location,
+    connection,
     device,
     customName,
     event = "authorized_ip_test"
@@ -92,19 +95,42 @@ export async function saveLogRecord({
     );
 
     const record = {
+        deviceId: deviceId || device?.deviceId || "DEV-UNKNOWN",
         ip: ip || finalIpv6 || finalIpv4 || "Unknown IP",
         ipv4: finalIpv4,
         ipv6: finalIpv6,
         networkType: finalNetworkType,
+        location: {
+            city: location?.city || "Unknown City",
+            region: location?.region || "",
+            country: location?.country || "Unknown Country",
+            countryCode: location?.countryCode || "",
+            flag: location?.flag || "🌐",
+            isp: location?.isp || "Unknown ISP",
+            org: location?.org || "",
+            asn: location?.asn || "",
+            timezone: location?.timezone || ""
+        },
+        connection: {
+            type: connection?.type || "Unknown",
+            downlink: connection?.downlink || null,
+            rtt: connection?.rtt || null
+        },
         timestamp,
         event,
         device: {
+            deviceId: deviceId || device?.deviceId || "DEV-UNKNOWN",
             summary: device?.summary || "Unknown Device",
             model: device?.model || "Unknown",
             type: device?.type || "Desktop",
             os: device?.os || "Unknown",
             browser: device?.browser || "Unknown",
             screen: device?.screen || "Unknown",
+            gpu: device?.gpu || "Standard GPU",
+            cpu: device?.cpu || "Unknown",
+            memory: device?.memory || "Unknown",
+            touch: device?.touch || "Unknown",
+            timezone: device?.timezone || "Unknown",
             language: device?.language || "Unknown",
             customName: customName ? customName.trim() : null
         }
@@ -142,10 +168,18 @@ export async function fetchLogs(maxCount = 200) {
                 const netType = data.networkType || (v4 && v6 ? "Dual-Stack (IPv4 + IPv6)" : v6 ? "IPv6 Only" : "IPv4 Only");
                 logs.push({
                     id: docSnap.id,
+                    deviceId: data.deviceId || data.device?.deviceId || "DEV-LEGACY",
                     ip: data.ip,
                     ipv4: v4,
                     ipv6: v6,
                     networkType: netType,
+                    location: data.location || {
+                        city: "Unknown City",
+                        country: "Unknown Country",
+                        isp: "Unknown ISP",
+                        flag: "🌐"
+                    },
+                    connection: data.connection || { type: "Unknown" },
                     timestamp: data.timestamp || (data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString()),
                     event: data.event,
                     device: data.device || {},
