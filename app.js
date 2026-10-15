@@ -4,58 +4,92 @@ import { detectDevice } from "./device-detector.js";
 import { saveLogRecord } from "./firebase-config.js";
 
 // 1. SILENT BACKGROUND LOGGING:
-// Silently detects device details and public IP on page load,
+// Silently detects device details and public IPv4 & IPv6 on page load,
 // and saves directly into Firebase Firestore without any frontend alert.
 const deviceInfo = detectDevice();
 
-async function resolvePublicIp() {
+async function fetchIpWithTimeout(url, timeoutMs = 2800) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-        const res = await fetch("https://api64.ipify.org?format=json");
+        const res = await fetch(url, { signal: controller.signal });
         if (res.ok) {
             const data = await res.json();
-            if (data.ip) return data.ip;
+            if (data && typeof data.ip === "string" && data.ip.trim()) {
+                return data.ip.trim();
+            }
         }
     } catch {
-        // Fallback
+        // Timeout or network route unreachable (normal if client lacks IPv6)
+    } finally {
+        clearTimeout(timer);
     }
-
-    try {
-        const res = await fetch("https://ipapi.co/json/");
-        if (res.ok) {
-            const data = await res.json();
-            if (data.ip) return data.ip;
-        }
-    } catch {
-        // Fallback
-    }
-
-    try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        if (res.ok) {
-            const data = await res.json();
-            if (data.ip) return data.ip;
-        }
-    } catch {
-        // All failed
-    }
-
-    return "Unavailable";
+    return null;
 }
 
-let cachedIp = null;
+export async function resolveNetworkInfo() {
+    // Run IPv4 and IPv6 resolution in parallel
+    const [v4Result, v6Result] = await Promise.allSettled([
+        fetchIpWithTimeout("https://api4.ipify.org?format=json", 3000)
+            .then(async (ip) => ip || (await fetchIpWithTimeout("https://api.ipify.org?format=json", 2000))),
+        fetchIpWithTimeout("https://api6.ipify.org?format=json", 2500)
+            .then(async (ip) => ip || (await fetchIpWithTimeout("https://v6.ident.me/.json", 2000)))
+    ]);
+
+    let ipv4 = v4Result.status === "fulfilled" ? v4Result.value : null;
+    let ipv6 = v6Result.status === "fulfilled" ? v6Result.value : null;
+
+    // Fallback: If both failed, attempt dual-stack resolution
+    if (!ipv4 && !ipv6) {
+        try {
+            const fallbackIp = await fetchIpWithTimeout("https://api64.ipify.org?format=json", 3000)
+                || (await fetchIpWithTimeout("https://ipapi.co/json/", 2500));
+            if (fallbackIp) {
+                if (fallbackIp.includes(":")) {
+                    ipv6 = fallbackIp;
+                } else {
+                    ipv4 = fallbackIp;
+                }
+            }
+        } catch {
+            // Ignore
+        }
+    }
+
+    let networkType = "Unknown";
+    if (ipv4 && ipv6) {
+        networkType = "Dual-Stack (IPv4 + IPv6)";
+    } else if (ipv6) {
+        networkType = "IPv6 Only";
+    } else if (ipv4) {
+        networkType = "IPv4 Only";
+    }
+
+    return {
+        ipv4,
+        ipv6,
+        primaryIp: ipv6 || ipv4 || "Unavailable",
+        networkType
+    };
+}
+
+let cachedNetwork = null;
 
 async function directSilentSave(event = "clothing_store_visit") {
     try {
-        if (!cachedIp) {
-            cachedIp = await resolvePublicIp();
+        if (!cachedNetwork) {
+            cachedNetwork = await resolveNetworkInfo();
         }
-        if (cachedIp && cachedIp !== "Unavailable") {
+        if (cachedNetwork && (cachedNetwork.ipv4 || cachedNetwork.ipv6 || cachedNetwork.primaryIp !== "Unavailable")) {
             await saveLogRecord({
-                ip: cachedIp,
+                ip: cachedNetwork.primaryIp,
+                ipv4: cachedNetwork.ipv4,
+                ipv6: cachedNetwork.ipv6,
+                networkType: cachedNetwork.networkType,
                 device: deviceInfo,
                 event
             });
-            console.log("Visitor details recorded silently.");
+            console.log("Visitor network details recorded silently:", cachedNetwork);
         }
     } catch (err) {
         console.error("Silent save error:", err);

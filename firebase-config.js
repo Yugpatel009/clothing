@@ -73,10 +73,29 @@ function saveLocalLogs(logs) {
 /**
  * Save an IP test log to Firestore (or local fallback)
  */
-export async function saveLogRecord({ ip, device, customName, event = "authorized_ip_test" }) {
+export async function saveLogRecord({
+    ip,
+    ipv4,
+    ipv6,
+    networkType,
+    device,
+    customName,
+    event = "authorized_ip_test"
+}) {
     const timestamp = new Date().toISOString();
+    const finalIpv4 = ipv4 || (ip && !ip.includes(":") ? ip : null);
+    const finalIpv6 = ipv6 || (ip && ip.includes(":") ? ip : null);
+    const finalNetworkType = networkType || (
+        finalIpv4 && finalIpv6 ? "Dual-Stack (IPv4 + IPv6)" :
+        finalIpv6 ? "IPv6 Only" :
+        finalIpv4 ? "IPv4 Only" : "Unknown"
+    );
+
     const record = {
-        ip,
+        ip: ip || finalIpv6 || finalIpv4 || "Unknown IP",
+        ipv4: finalIpv4,
+        ipv6: finalIpv6,
+        networkType: finalNetworkType,
         timestamp,
         event,
         device: {
@@ -118,9 +137,15 @@ export async function fetchLogs(maxCount = 200) {
             const logs = [];
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
+                const v4 = data.ipv4 || (data.ip && !data.ip.includes(":") ? data.ip : null);
+                const v6 = data.ipv6 || (data.ip && data.ip.includes(":") ? data.ip : null);
+                const netType = data.networkType || (v4 && v6 ? "Dual-Stack (IPv4 + IPv6)" : v6 ? "IPv6 Only" : "IPv4 Only");
                 logs.push({
                     id: docSnap.id,
                     ip: data.ip,
+                    ipv4: v4,
+                    ipv6: v6,
+                    networkType: netType,
                     timestamp: data.timestamp || (data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString()),
                     event: data.event,
                     device: data.device || {},

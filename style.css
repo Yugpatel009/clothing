@@ -672,7 +672,7 @@ footer {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -1087,6 +1087,81 @@ td code {
   color: var(--blue-dark);
   font-style: italic;
   margin-top: 0.15rem;
+}
+
+/* IP and Network Badges in Admin Table */
+.ip-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 220px;
+}
+
+.ip-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+}
+
+.ip-tag {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.ip-tag-v4 {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.ip-tag-v6 {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.ip-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.ip-unsupported {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-style: italic;
+}
+
+.network-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: fit-content;
+  margin-bottom: 0.15rem;
+}
+
+.network-dual {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.network-v4 {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.network-v6 {
+  background: #f3e8ff;
+  color: #7e22ce;
 }
 
 .delete-row-button {

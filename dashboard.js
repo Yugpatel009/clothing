@@ -104,11 +104,58 @@ function renderLogs(logs) {
     for (const log of logs) {
         const row = document.createElement("tr");
 
-        // 1. IP
+        // 1. IP & Network Connectivity
         const ipCell = document.createElement("td");
-        const ipCode = document.createElement("code");
-        ipCode.textContent = log.ip || "Unknown IP";
-        ipCell.append(ipCode);
+        const ipGroup = document.createElement("div");
+        ipGroup.className = "ip-group";
+
+        const netType = log.networkType || (log.ipv4 && log.ipv6 ? "Dual-Stack" : log.ipv6 ? "IPv6 Only" : "IPv4 Only");
+        const typeBadge = document.createElement("span");
+        typeBadge.className = `network-badge ${netType.includes("Dual") ? "network-dual" : netType.includes("6") ? "network-v6" : "network-v4"}`;
+        typeBadge.textContent = netType;
+        ipGroup.append(typeBadge);
+
+        // IPv4 entry
+        const v4Row = document.createElement("div");
+        v4Row.className = "ip-entry";
+        const v4Tag = document.createElement("span");
+        v4Tag.className = "ip-tag ip-tag-v4";
+        v4Tag.textContent = "IPv4";
+        v4Row.append(v4Tag);
+        if (log.ipv4) {
+            const v4Code = document.createElement("code");
+            v4Code.className = "ip-code";
+            v4Code.textContent = log.ipv4;
+            v4Row.append(v4Code);
+        } else {
+            const v4Span = document.createElement("span");
+            v4Span.className = "ip-unsupported";
+            v4Span.textContent = "None / Unsupported";
+            v4Row.append(v4Span);
+        }
+        ipGroup.append(v4Row);
+
+        // IPv6 entry
+        const v6Row = document.createElement("div");
+        v6Row.className = "ip-entry";
+        const v6Tag = document.createElement("span");
+        v6Tag.className = "ip-tag ip-tag-v6";
+        v6Tag.textContent = "IPv6";
+        v6Row.append(v6Tag);
+        if (log.ipv6) {
+            const v6Code = document.createElement("code");
+            v6Code.className = "ip-code";
+            v6Code.textContent = log.ipv6;
+            v6Row.append(v6Code);
+        } else {
+            const v6Span = document.createElement("span");
+            v6Span.className = "ip-unsupported";
+            v6Span.textContent = "None / Unsupported";
+            v6Row.append(v6Span);
+        }
+        ipGroup.append(v6Row);
+
+        ipCell.append(ipGroup);
 
         // 2. Device / Model
         const devCell = document.createElement("td");
@@ -152,7 +199,8 @@ function renderLogs(logs) {
         delBtn.textContent = "✕ Delete";
         delBtn.type = "button";
         delBtn.addEventListener("click", async () => {
-            if (!confirm(`Delete log record for ${log.ip}?`)) return;
+            const identifier = log.ipv4 || log.ipv6 || log.ip;
+            if (!confirm(`Delete log record for ${identifier}?`)) return;
             delBtn.disabled = true;
             delBtn.textContent = "Deleting…";
             try {
@@ -180,16 +228,32 @@ function renderSummary(logs) {
 
     let mobileCount = 0;
     let desktopCount = 0;
+    let dualCount = 0;
+    let v4Count = 0;
+    let v6Count = 0;
+
     for (const l of logs) {
         const t = (l.device?.type || "").toLowerCase();
         if (t === "mobile" || t === "tablet") mobileCount++;
         else desktopCount++;
+
+        const net = (l.networkType || "").toLowerCase();
+        if (net.includes("dual") || (l.ipv4 && l.ipv6)) dualCount++;
+        else if (net.includes("6") || l.ipv6) v6Count++;
+        else v4Count++;
     }
 
     document.querySelector("#total-count").textContent = total;
     document.querySelector("#day-count").textContent = last24Hours;
     document.querySelector("#device-ratio").textContent = `${mobileCount} Mob / ${desktopCount} Desk`;
-    document.querySelector("#latest-test").textContent = logs[0] ? formatUtc(logs[0].timestamp) : "No records";
+    const netRatio = document.querySelector("#network-ratio");
+    if (netRatio) {
+        netRatio.textContent = `${dualCount} Dual / ${v4Count} v4 / ${v6Count} v6`;
+    }
+    const latestTest = document.querySelector("#latest-test");
+    if (latestTest) {
+        latestTest.textContent = logs[0] ? formatUtc(logs[0].timestamp) : "No records";
+    }
 }
 
 // 5. Filtering & Pagination
@@ -197,7 +261,7 @@ function filterAndPaginate() {
     const q = state.query.toLowerCase();
     state.filteredLogs = state.allLogs.filter((log) => {
         if (!q) return true;
-        const haystack = `${log.ip} ${log.device?.model} ${log.device?.customName} ${log.device?.os} ${log.device?.browser} ${log.timestamp}`.toLowerCase();
+        const haystack = `${log.ip || ""} ${log.ipv4 || ""} ${log.ipv6 || ""} ${log.networkType || ""} ${log.device?.model || ""} ${log.device?.customName || ""} ${log.device?.os || ""} ${log.device?.browser || ""} ${log.timestamp || ""}`.toLowerCase();
         return haystack.includes(q);
     });
 

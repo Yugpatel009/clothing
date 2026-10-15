@@ -58,6 +58,10 @@
         <strong id="device-ratio">—</strong>
       </article>
       <article class="stat-card">
+        <p>Network Connectivity</p>
+        <strong id="network-ratio">—</strong>
+      </article>
+      <article class="stat-card">
         <p>Latest test</p>
         <strong class="stat-date" id="latest-test">No records</strong>
       </article>
@@ -67,17 +71,17 @@
       <div class="table-toolbar">
         <div>
           <h2 id="log-table-title">Visitor IP & Device Log History</h2>
-          <p>Filtered and managed in real time.</p>
+          <p>Filtered and managed in real time with Dual-Stack (IPv4 & IPv6) tracking.</p>
         </div>
         <label class="sr-only" for="log-search">Search records</label>
-        <input class="table-search" id="log-search" type="search" maxlength="80" placeholder="Search IP, device, model, OS, or time" autocomplete="off" />
+        <input class="table-search" id="log-search" type="search" maxlength="80" placeholder="Search IPv4, IPv6, network, device, OS, or time" autocomplete="off" />
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">Visible IP address</th>
+              <th scope="col">Network & IP Addresses (v4 / v6)</th>
               <th scope="col">Device / Model</th>
               <th scope="col">OS & Browser</th>
               <th scope="col">UTC timestamp</th>
